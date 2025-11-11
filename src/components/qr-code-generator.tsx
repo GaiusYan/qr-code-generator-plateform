@@ -17,7 +17,7 @@ import z from "zod";
 import { FormControl, FormField, FormItem, FormLabel } from "./ui/form";
 import { Input } from "./ui/input";
 import { FaSpinner } from "react-icons/fa";
-import QRCode from "qrcode"
+import QRCode from "qrcode";
 
 
 export const QRCodeGenerator = () => {
