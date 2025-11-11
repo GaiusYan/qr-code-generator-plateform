@@ -5,12 +5,7 @@ export interface userInformation {
     email: string,
     phone: string,
     compagny: string,
-    wibsite: string,
+    website: string,
     address?: string
-    facebook?: string,
-    instagram?: string,
-    linkedin?: string,
-    twitter?: string,
-    tiktok?: string
-    whatsApp?: string
+    whatsapp?: string
 }
