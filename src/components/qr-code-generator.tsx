@@ -79,6 +79,16 @@ export const QRCodeGenerator = () => {
         });
     }
 
+    const downloadQRcode = () => {
+        if (!qrCode) return;
+        const link = document.createElement("a");
+        link.href = qrCode as string;
+        link.download = `qrcode-contact.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
     return (
         <div className="space-x-8">
             <div className="flex md:flex-row flex-col gap-2 items-center justify-center min-h-screen w-full">
@@ -190,7 +200,7 @@ export const QRCodeGenerator = () => {
                 </Form>
                 <Card className="w-[400px] h-auto">
                     <CardHeader>
-                        <CardTitle>Votre QR code</CardTitle>
+                        <CardTitle className='text-[#7E69AB]'>Votre QR code</CardTitle>
                         <CardDescription>Scanner-le avec votre téléphone</CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -205,6 +215,7 @@ export const QRCodeGenerator = () => {
 
                                 <div className="w-full space-y-3">
                                     <Button
+                                        onClick={downloadQRcode}
                                         variant="outline"
                                         className="w-full border-2 font-semibold bg-transparent"
                                         size="lg"
