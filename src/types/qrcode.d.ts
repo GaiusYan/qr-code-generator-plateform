@@ -2,8 +2,18 @@ declare module "qrcode" {
   export function toCanvas(
     canvas: HTMLCanvasElement,
     text: string,
-    callback?: (err?: Error) => void
-  ): void;
+    {errorCorrectionLevel, width, margin, color}: callbackInterface)
+  : void;
+
+  interface callbackInterface {
+    errorCorrectionLevel: string,
+    width: number,
+    margin: number,
+    color: {
+      dark: string,
+      light: string,
+    },
+  }
 
   export function toDataURL(
     text: string,

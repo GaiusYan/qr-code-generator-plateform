@@ -55,21 +55,21 @@ export const QRCodeGenerator = () => {
                     "END:VCARD",
                 ].join("\n");
     
-                if (canvasRef.current) {
-                    await QRCode.toCanvas(canvasRef.current, vCard, {
-                        errorCorrectionLevel: "H",
-                        width: 300,
-                        margin: 1,
-                        color: {
-                            dark: "#000000",
-                            light: "#FFFFFF",
-                        },
-                    });
+            if (canvasRef.current) {
+                await QRCode.toCanvas(canvasRef.current, vCard, {
+                    errorCorrectionLevel: "H",
+                    width: 300,
+                    margin: 1,
+                    color: {
+                        dark: "#000000",
+                        light: "#FFFFFF",
+                    },
+                });
                 // Convert to data URL for display
                 const dataUrl = canvasRef.current.toDataURL("image/png")
                 setQrCode(dataUrl);
-            } 
-        }catch(error) {
+            }
+        } catch(error) {
             console.log(error);
         }
         });
