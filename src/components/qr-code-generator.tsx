@@ -16,13 +16,14 @@ import {useForm} from "react-hook-form";
 import z from "zod";
 import { FormControl, FormField, FormItem, FormLabel } from "./ui/form";
 import { Input } from "./ui/input";
+import { FaSpinner } from "react-icons/fa";
+import QRCode from "qrcode"
 
 
 export const QRCodeGenerator = () => {
 
     const [isPending, startTransition] = useTransition();
     const [qrCode, setQrCode] = useState<String>("");
-    const [isLoading, setIsLoading] = useState(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const form = useForm<z.infer<typeof QRCodeGeneratorSchema>>({
@@ -36,8 +37,46 @@ export const QRCodeGenerator = () => {
         },
     });
 
-    const onSubmit = (values : z.infer<typeof QRCodeGeneratorSchema>) => {
-        console.log(values);
+
+    const onSubmit =  (values : z.infer<typeof QRCodeGeneratorSchema>) => {
+        startTransition(async () => {
+            console.log(values);
+
+            try {
+
+                const vCard = [
+                    "BEGIN:VCARD",
+                    "VERSION:3.0",
+                    `FN:${values.name || "Contact"}`,
+                    ...(values.email ? [`EMAIL:${values.email}`] : []),
+                    ...(values.phone ? [`TEL:${values.phone}`] : []),
+                    ...(values.compagny ? [`ORG:${values.compagny}`] : []),
+                    ...(values.website ? [`URL:${values.website}`] : []),
+                    "END:VCARD",
+                ].join("\n");
+    
+                if (canvasRef.current) {
+                    await QRCode.toCanvas(canvasRef.current, vCard, {
+                    errorCorrectionLevel: "H",
+                    type: "image/png",
+                    quality: 0.95,
+                    margin: 1,
+                    width: 300,
+                    color: {
+                        dark: "#000000",
+                        light: "#FFFFFF",
+                    },
+                });
+                // Convert to data URL for display
+                const dataUrl = canvasRef.current.toDataURL("image/png")
+                setQrCode(dataUrl);
+                console.log(dataUrl);
+            } 
+        }catch(error) {
+            console.log(error);
+        }
+
+        });
     }
 
     return (
@@ -139,16 +178,54 @@ export const QRCodeGenerator = () => {
                                     type="submit" 
                                     className="w-full font-semibold text-lg" 
                                     size={"icon-lg"}>
-                                    Générer le QR code
+                                    {isPending ? 
+                                        (<>
+                                            <FaSpinner className="animate-spin"/> Génération
+                                        </>) : 
+                                        "Générer le QR code"}
                                 </Button>
                             </CardFooter>
                         </Card>
                     </form>
                 </Form>
                 <Card className="w-[400px] h-auto">
-                    <CardHeader>Vos informations</CardHeader>
+                    <CardHeader>
+                        <CardTitle>Votre QR code</CardTitle>
+                        <CardDescription>Scanner-le avec votre téléphone</CardDescription>
+                    </CardHeader>
                     <CardContent>
-                        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Assumenda quidem voluptatum voluptate incidunt facilis labore qui minima cum numquam, modi consequatur accusantium animi illum vero quae corrupti? Cum, velit quod!
+                        {qrCode ? 
+                            <>
+                                <div className="bg-white p-4 rounded-lg border-2 border-primary">
+                                    <img 
+                                        src={(qrCode || "/favicon.ico") as string} 
+                                        alt="QR Code" 
+                                        className="w-full h-auto" />
+                                </div>
+
+                                <div className="w-full space-y-3">
+                                    <Button
+                                        variant="outline"
+                                        className="w-full border-2 font-semibold bg-transparent"
+                                        size="lg"
+                                    >
+                                        Télécharger le QR Code
+                                    </Button>
+                                </div>
+                            </>
+                        :
+                            <>
+                                <div className="text-center space-y-4">
+                                    <div className="w-full h-40 bg-muted rounded-lg flex items-center justify-center border-2 border-dashed border-muted-foreground">
+                                    <div className="text-center">
+                                        <p className="text-muted-foreground font-semibold">Aucun QR Code</p>
+                                        <p className="text-sm text-muted-foreground">Cliquez sur le bouton pour en générer un</p>
+                                    </div>
+                                    </div>
+                                </div>
+                            </>
+                        }
+                        <canvas ref={canvasRef} style={{ display: "none" }} />
                     </CardContent>
                 </Card>
             </div>
